@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net;
 using System.Management;
 using System.Windows.Forms;
@@ -62,9 +62,67 @@ namespace SupportApp
             string info = "System Information\n\n";
             try
             {
+                // Serial Number
+                string serialNumber = "Unknown";
+                try
+                {
+                    ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT SerialNumber FROM Win32_BIOS");
+                    foreach (ManagementObject obj in searcher.Get())
+                    {
+                        serialNumber = obj["SerialNumber"]?.ToString() ?? "Unknown";
+                        break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    serialNumber = $"Error: {ex.Message}";
+                }
+                info += $"Serial Number: {serialNumber}\n";
+
+                // Manufacturer
+                string manufacturer = "Unknown";
+                try
+                {
+                    ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT Manufacturer FROM Win32_ComputerSystem");
+                    foreach (ManagementObject obj in searcher.Get())
+                    {
+                        manufacturer = obj["Manufacturer"]?.ToString() ?? "Unknown";
+                        break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    manufacturer = $"Error: {ex.Message}";
+                }
+                info += $"Manufacturer: {manufacturer}\n";
+
+                // Model
+                string model = "Unknown";
+                try
+                {
+                    ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT Model FROM Win32_ComputerSystem");
+                    foreach (ManagementObject obj in searcher.Get())
+                    {
+                        model = obj["Model"]?.ToString() ?? "Unknown";
+                        break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    model = $"Error: {ex.Message}";
+                }
+                info += $"Model: {model}\n";
+
+                // Blank line
+                info += "\n";
+
+                // Hostname
                 info += $"Hostname: {Dns.GetHostName()}\n";
+
+                // IP Address
                 info += $"IP Address: {Dns.GetHostEntry(Dns.GetHostName()).AddressList[0].ToString()}\n";
 
+                // Uptime
                 string uptimeStr = "N/A";
                 try
                 {
@@ -83,6 +141,7 @@ namespace SupportApp
                 }
                 info += $"Uptime: {uptimeStr}\n";
 
+                // System Memory
                 string totalMemoryGB = "N/A";
                 try
                 {
@@ -101,59 +160,12 @@ namespace SupportApp
                 }
                 info += $"System Memory: {totalMemoryGB}\n";
 
+                // Disk Space
                 DriveInfo drive = new DriveInfo("C");
                 double freeSpaceGB = drive.TotalFreeSpace / (1024.0 * 1024.0 * 1024.0);
                 double totalSpaceGB = drive.TotalSize / (1024.0 * 1024.0 * 1024.0);
                 info += $"Free Disk Space (C:): {freeSpaceGB:F2} GB\n";
                 info += $"Total Disk Space (C:): {totalSpaceGB:F2} GB\n";
-
-                string manufacturer = "Unknown";
-                try
-                {
-                    ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT Manufacturer FROM Win32_ComputerSystem");
-                    foreach (ManagementObject obj in searcher.Get())
-                    {
-                        manufacturer = obj["Manufacturer"]?.ToString() ?? "Unknown";
-                        break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    manufacturer = $"Error: {ex.Message}";
-                }
-                info += $"Manufacturer: {manufacturer}\n";
-
-                string model = "Unknown";
-                try
-                {
-                    ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT Model FROM Win32_ComputerSystem");
-                    foreach (ManagementObject obj in searcher.Get())
-                    {
-                        model = obj["Model"]?.ToString() ?? "Unknown";
-                        break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    model = $"Error: {ex.Message}";
-                }
-                info += $"Model: {model}\n";
-
-                string serialNumber = "Unknown";
-                try
-                {
-                    ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT SerialNumber FROM Win32_BIOS");
-                    foreach (ManagementObject obj in searcher.Get())
-                    {
-                        serialNumber = obj["SerialNumber"]?.ToString() ?? "Unknown";
-                        break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    serialNumber = $"Error: {ex.Message}";
-                }
-                info += $"Serial Number: {serialNumber}\n";
             }
             catch (Exception ex)
             {
